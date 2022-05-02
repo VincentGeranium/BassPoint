@@ -63,16 +63,24 @@ extension MapView {
             )
         )
         
-        mapView.setRegion(region, animated: false)
-        
-        
-        mapView.addAnnotation(annotation)
+        DispatchQueue.main.async { [weak self] in
+            self?.mapView.setRegion(region, animated: false)
+            self?.mapView.addAnnotation(annotation)
+            if annotation.coordinate.latitude != region.center.latitude && annotation.coordinate.longitude != region.center.longitude {
+                self?.removeMapPin(pin: annotation)
+            }
+        }
+
         
     }
     
     
-    func addPin(latitude: CLLocationDegrees,longitude: CLLocationDegrees) {
+    func addPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
         pin = MKPointAnnotation()
+        pin?.coordinate = CLLocationCoordinate2D(
+            latitude: latitude,
+            longitude: longitude
+        )
         guard let pin = pin else { return }
         DispatchQueue.main.async { [weak self] in
             pin.coordinate.longitude = latitude
@@ -96,8 +104,12 @@ extension MapView: CLLocationManagerDelegate {
             let latitude = location.coordinate.latitude
             let longitude = location.coordinate.longitude
             
-            setRegion(latitude: latitude, longitude: longitude)
-            addPin(latitude: latitude, longitude: longitude)
+            DispatchQueue.main.async { [weak self] in
+                self?.setRegion(latitude: latitude, longitude: longitude)
+                
+//                self?.addPin(latitude: latitude, longitude: longitude)
+            }
+            
         }
     }
     
