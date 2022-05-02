@@ -24,24 +24,26 @@ class MapView: UIViewController {
     override func viewDidLoad() {
         self.view.addSubview(mapView)
         self.mapView.frame = view.bounds
+        
+        
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
         locationManager.allowsBackgroundLocationUpdates = true
         
-//        setRegion()
-//        addPin()
+        //        setRegion()
+        //        addPin()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-//        setRegion()
-//        addPin()
+        //        setRegion()
+        //        addPin()
     }
 }
 
 extension MapView {
     func setRegion(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
-      
+        
         print(latitude)
         print(longitude)
         
@@ -51,7 +53,7 @@ extension MapView {
             longitude: longitude
         )
         
-       
+        
         let region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(
                 latitude: latitude,
@@ -63,14 +65,16 @@ extension MapView {
             )
         )
         
+        
+        
+        
         DispatchQueue.main.async { [weak self] in
             self?.mapView.setRegion(region, animated: false)
-            self?.mapView.addAnnotation(annotation)
-            if annotation.coordinate.latitude != region.center.latitude && annotation.coordinate.longitude != region.center.longitude {
-                self?.removeMapPin(pin: annotation)
-            }
+            //            self?.mapView.addAnnotation(annotation)
+            self?.mapView.showsUserLocation = true
+            
         }
-
+        
         
     }
     
@@ -83,10 +87,14 @@ extension MapView {
         )
         guard let pin = pin else { return }
         DispatchQueue.main.async { [weak self] in
-            pin.coordinate.longitude = latitude
-            pin.coordinate.latitude = longitude
+//            pin.coordinate.longitude = latitude
+//            pin.coordinate.latitude = longitude
+            
             self?.mapView.addAnnotation(pin)
-            self?.removeMapPin(pin: pin)
+            if pin.coordinate.latitude != latitude && pin.coordinate.longitude != longitude {
+                self?.removeMapPin(pin: pin)
+            }
+        
         }
         
     }
@@ -151,4 +159,6 @@ extension MapView: CLLocationManagerDelegate {
             fatalError()
         }
     }
+    
+    
 }
