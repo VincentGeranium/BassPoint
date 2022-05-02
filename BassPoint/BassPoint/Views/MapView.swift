@@ -17,6 +17,8 @@ class MapView: UIViewController {
         return mapView
     }()
     
+    var pin: MKPointAnnotation?
+    
     let locationManager: CLLocationManager = CLLocationManager()
     
     override func viewDidLoad() {
@@ -33,7 +35,7 @@ class MapView: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
 //        setRegion()
-        addPin()
+//        addPin()
     }
 }
 
@@ -49,8 +51,7 @@ extension MapView {
             longitude: longitude
         )
         
-        mapView.addAnnotation(annotation)
-        
+       
         let region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(
                 latitude: latitude,
@@ -63,12 +64,28 @@ extension MapView {
         )
         
         mapView.setRegion(region, animated: false)
+        
+        
+        mapView.addAnnotation(annotation)
+        
     }
     
     
-    func addPin() {
-        let pin = MKPointAnnotation()
-        mapView.addAnnotation(pin)
+    func addPin(latitude: CLLocationDegrees,longitude: CLLocationDegrees) {
+        pin = MKPointAnnotation()
+        guard let pin = pin else { return }
+        DispatchQueue.main.async { [weak self] in
+            pin.coordinate.longitude = latitude
+            pin.coordinate.latitude = longitude
+            self?.mapView.addAnnotation(pin)
+            self?.removeMapPin(pin: pin)
+        }
+        
+    }
+    
+    func removeMapPin(pin: MKPointAnnotation) {
+            mapView.removeAnnotation(pin)
+            self.pin = nil
     }
 }
 
@@ -80,6 +97,7 @@ extension MapView: CLLocationManagerDelegate {
             let longitude = location.coordinate.longitude
             
             setRegion(latitude: latitude, longitude: longitude)
+            addPin(latitude: latitude, longitude: longitude)
         }
     }
     
